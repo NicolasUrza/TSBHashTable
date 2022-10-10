@@ -302,6 +302,9 @@ public class TSBHashTableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
         return null;
     }
 
+
+
+
     /**
      * Copia en esta tabla, todos los objetos contenidos en el map especificado.
      * Los nuevos objetos reemplazarán a los que ya existan en la tabla 
@@ -439,11 +442,15 @@ public class TSBHashTableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
      *         interface Cloneable.    
      */ 
     @Override
-    protected Object clone() throws CloneNotSupportedException 
+    protected Object clone() throws CloneNotSupportedException
     {
         // HACER...
         TSBHashTableDA<K, V> t = (TSBHashTableDA<K, V>)super.clone();
-
+        //clonar la tabla
+        t.table = new Object[table.length];
+        System.arraycopy(this.table, 0, t.table, 0, table.length);
+        t.modCount = 0;
+        t.count = count;
         return t;
     }
 

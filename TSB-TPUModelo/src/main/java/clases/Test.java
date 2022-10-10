@@ -55,5 +55,18 @@ public class Test
             Map.Entry<Integer, String> entry = it.next();
             System.out.println("Par: " + entry);
         }
+
+        System.out.println("Tabla 1 clonada en una tercera tabla");
+        TSBHashTableDA<Integer, String> ht3 = null;
+        try {
+            ht3 = (TSBHashTableDA<Integer, String>) ht1.clone();
+        } catch (CloneNotSupportedException ex) {
+            System.out.println("Error al clonar la tabla");
+        }
+        System.out.println("Tabla 3: " + ht3);
+        ht3.put(13, "Canada");
+        System.out.println("Tabla 3 luego de una inserción: " + ht3);
+        System.out.println("Tabla 1 luego de una inserción en la tabla 3: " + ht1);
+
     }
 }
