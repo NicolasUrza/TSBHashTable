@@ -14,7 +14,7 @@ public class Test
     public static void main(String args[])
     {
         // una tabla "corta" con factor de carga pequeño...
-        TSBHashtableDA<Integer, String> ht1 = new TSBHashtableDA<>(3, 0.2f);
+        TSBHashTableDA<Integer, String> ht1 = new TSBHashTableDA<>(3, 0.2f);
         System.out.println("Contenido inicial: " + ht1);
         
         // algunas inserciones...
@@ -44,7 +44,7 @@ public class Test
         ht1.put(10, "Bolivia");
         ht1.put(11, "Venezuela");
         ht1.put(12, "Estados Unidos");
-        TSBHashtableDA<Integer, String> ht2 = new TSBHashtableDA<>(ht1);
+        TSBHashTableDA<Integer, String> ht2 = new TSBHashTableDA<>(ht1);
         System.out.println("Segunda tabla: " + ht2);
         
         System.out.println("Tabla 1 recorrida a partir de una vista: ");

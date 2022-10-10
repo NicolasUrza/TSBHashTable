@@ -1,10 +1,9 @@
-package test;
-
-;
+package clases;
 import org.junit.Before;
 import org.junit.Test;
+
 import java.util.*;
-import
+
 import static org.junit.Assert.*;
 
 public class TSBHashTableDATest {

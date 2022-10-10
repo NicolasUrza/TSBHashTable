@@ -1,7 +1,6 @@
 package clases;
 
 import java.io.Serializable;
-import java.security.Key;
 import java.util.*;
 
 /**
@@ -14,7 +13,7 @@ import java.util.*;
  * @param <K> el tipo de los objetos que serán usados como clave en la tabla.
  * @param <V> el tipo de los objetos que serán los valores de la tabla.
  */
-public class TSBHashtableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, Cloneable, Serializable
+public class TSBHashTableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, Cloneable, Serializable
 {
     //************************ Constantes (privadas o públicas).
 
@@ -68,7 +67,7 @@ public class TSBHashtableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
      * Crea una tabla vacía, con la capacidad inicial igual a 11 y con factor 
      * de carga igual a 0.5f (que equivale a un nivel de carga del 50%).
      */    
-    public TSBHashtableDA()
+    public TSBHashTableDA()
     {
         this(11, 0.5f);
     }
@@ -78,7 +77,7 @@ public class TSBHashtableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
      * de carga igual a 0.5f (que equivale a un nivel de carga del 50%).
      * @param initial_capacity la capacidad inicial de la tabla.
      */    
-    public TSBHashtableDA(int initial_capacity)
+    public TSBHashTableDA(int initial_capacity)
     {
         this(initial_capacity, 0.5f);
     }
@@ -93,7 +92,7 @@ public class TSBHashtableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
      * @param initial_capacity la capacidad inicial de la tabla.
      * @param load_factor el factor de carga de la tabla.
      */
-    public TSBHashtableDA(int initial_capacity, float load_factor)
+    public TSBHashTableDA(int initial_capacity, float load_factor)
     {
         if(load_factor <= 0 || load_factor > 0.5) { load_factor = 0.5f; }
         if(initial_capacity <= 0) { initial_capacity = 11; }
@@ -121,7 +120,7 @@ public class TSBHashtableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
      * Crea una tabla a partir del contenido del Map especificado.
      * @param t el Map a partir del cual se creará la tabla.
      */     
-    public TSBHashtableDA(Map<? extends K,? extends V> t)
+    public TSBHashTableDA(Map<? extends K,? extends V> t)
     {
         this(11, 0.5f);
         this.putAll(t);
@@ -443,7 +442,7 @@ public class TSBHashtableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
     protected Object clone() throws CloneNotSupportedException 
     {
         // HACER...
-        TSBHashtableDA<K, V> t = (TSBHashtableDA<K, V>)super.clone();
+        TSBHashTableDA<K, V> t = (TSBHashTableDA<K, V>)super.clone();
 
         return t;
     }
@@ -815,25 +814,25 @@ public class TSBHashtableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
         @Override
         public int size() 
         {
-            return TSBHashtableDA.this.count;
+            return TSBHashTableDA.this.count;
         }
         
         @Override
         public boolean contains(Object o) 
         {
-            return TSBHashtableDA.this.containsKey(o);
+            return TSBHashTableDA.this.containsKey(o);
         }
         
         @Override
         public boolean remove(Object o) 
         {
-            return (TSBHashtableDA.this.remove(o) != null);
+            return (TSBHashTableDA.this.remove(o) != null);
         }
         
         @Override
         public void clear() 
         {
-            TSBHashtableDA.this.clear();
+            TSBHashTableDA.this.clear();
         }
         
         private class KeySetIterator implements Iterator<K>
@@ -854,7 +853,7 @@ public class TSBHashtableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
             {
                 // HACER...
                 next_ok = false;
-                expected_modCount = TSBHashtableDA.this.modCount;
+                expected_modCount = TSBHashTableDA.this.modCount;
             }
 
             /*
@@ -877,7 +876,7 @@ public class TSBHashtableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
                 // REVISAR Y HACER...
 
                 // control: fail-fast iterator...
-                if(TSBHashtableDA.this.modCount != expected_modCount)
+                if(TSBHashTableDA.this.modCount != expected_modCount)
                 {    
                     throw new ConcurrentModificationException("next(): modificación inesperada de tabla...");
                 }
@@ -914,10 +913,10 @@ public class TSBHashtableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
                 next_ok = false;
                                 
                 // la tabla tiene un elementon menos...
-                TSBHashtableDA.this.count--;
+                TSBHashTableDA.this.count--;
 
                 // fail_fast iterator...
-                TSBHashtableDA.this.modCount++;
+                TSBHashTableDA.this.modCount++;
                 expected_modCount++;
             }     
         }
@@ -974,13 +973,13 @@ public class TSBHashtableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
         @Override
         public int size() 
         {
-            return TSBHashtableDA.this.count;
+            return TSBHashTableDA.this.count;
         }
 
         @Override
         public void clear() 
         {
-            TSBHashtableDA.this.clear();
+            TSBHashTableDA.this.clear();
         }
         
         private class EntrySetIterator implements Iterator<Map.Entry<K, V>>
@@ -1004,7 +1003,7 @@ public class TSBHashtableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
                 actual = 0;
                 previo = 0;
                 next_ok = false;
-                expected_modCount = TSBHashtableDA.this.modCount;
+                expected_modCount = TSBHashTableDA.this.modCount;
             }
 
             /*
@@ -1016,15 +1015,15 @@ public class TSBHashtableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
             {
                 // HACER... Hecho(?)
                 //Map.Entry<K, V> t[] = (Entry<K, V>[]) TSBHashtableDA.this.table;
-                if(TSBHashtableDA.this.isEmpty()) { return false; }
-                if(actual >= TSBHashtableDA.this.table.length) { return false; }
+                if(TSBHashTableDA.this.isEmpty()) { return false; }
+                if(actual >= TSBHashTableDA.this.table.length) { return false; }
                 int siguiente = actual;
                 // buscamos el siguiente nodo que no este abierto ni sea una tumba...
                 do{
                     siguiente++;
-                    if(siguiente >= TSBHashtableDA.this.table.length) { return false; }
+                    if(siguiente >= TSBHashTableDA.this.table.length) { return false; }
                 }
-                while (((Entry<K,V>)TSBHashtableDA.this.table[siguiente]).getState() != CLOSED);
+                while (((Entry<K,V>) TSBHashTableDA.this.table[siguiente]).getState() != CLOSED);
                 return true;
             }
 
@@ -1037,7 +1036,7 @@ public class TSBHashtableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
                 //HACER...Hecho?
 
                 // control: fail-fast iterator...
-                if(TSBHashtableDA.this.modCount != expected_modCount)
+                if(TSBHashTableDA.this.modCount != expected_modCount)
                 {    
                     throw new ConcurrentModificationException("next(): modificación inesperada de tabla...");
                 }
@@ -1048,7 +1047,7 @@ public class TSBHashtableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
                 }
                 //Map.Entry<K, V> t[] = (Map.Entry<K, V>[]) TSBHashtableDA.this.table;
                 int siguiente = actual+1;
-                while (((Entry<K,V>)TSBHashtableDA.this.table[siguiente]).getState() != CLOSED)
+                while (((Entry<K,V>) TSBHashTableDA.this.table[siguiente]).getState() != CLOSED)
                 {
                     siguiente++;
                 }
@@ -1058,7 +1057,7 @@ public class TSBHashtableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
                 previo = actual;
                 actual = siguiente;
                 // y retornar el elemento alcanzado...
-                return (Entry<K,V>)TSBHashtableDA.this.table[siguiente];
+                return (Entry<K,V>) TSBHashTableDA.this.table[siguiente];
             }
             
             /*
@@ -1082,10 +1081,10 @@ public class TSBHashtableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
                 next_ok = false;
                                 
                 // la tabla tiene un elementon menos...
-                TSBHashtableDA.this.count--;
+                TSBHashTableDA.this.count--;
 
                 // fail_fast iterator...
-                TSBHashtableDA.this.modCount++;
+                TSBHashTableDA.this.modCount++;
                 expected_modCount++;
             }     
         }
@@ -1112,19 +1111,19 @@ public class TSBHashtableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
         @Override
         public int size() 
         {
-            return TSBHashtableDA.this.count;
+            return TSBHashTableDA.this.count;
         }
         
         @Override
         public boolean contains(Object o) 
         {
-            return TSBHashtableDA.this.containsValue(o);
+            return TSBHashTableDA.this.containsValue(o);
         }
         
         @Override
         public void clear() 
         {
-            TSBHashtableDA.this.clear();
+            TSBHashTableDA.this.clear();
         }
         
         private class ValueCollectionIterator implements Iterator<V>
@@ -1146,7 +1145,7 @@ public class TSBHashtableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
                 // HACER...
 
                 next_ok = false;
-                expected_modCount = TSBHashtableDA.this.modCount;
+                expected_modCount = TSBHashTableDA.this.modCount;
             }
 
             /*
@@ -1170,7 +1169,7 @@ public class TSBHashtableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
                 // HACER...
 
                 // control: fail-fast iterator...
-                if(TSBHashtableDA.this.modCount != expected_modCount)
+                if(TSBHashTableDA.this.modCount != expected_modCount)
                 {    
                     throw new ConcurrentModificationException("next(): modificación inesperada de tabla...");
                 }
@@ -1210,10 +1209,10 @@ public class TSBHashtableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
                 next_ok = false;
                                 
                 // la tabla tiene un elementon menos...
-                TSBHashtableDA.this.count--;
+                TSBHashTableDA.this.count--;
 
                 // fail_fast iterator...
-                TSBHashtableDA.this.modCount++;
+                TSBHashTableDA.this.modCount++;
                 expected_modCount++;
             }     
         }
