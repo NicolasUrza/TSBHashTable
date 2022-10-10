@@ -213,6 +213,9 @@ public class TSBHashTableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
         //si encontramos la key, retornamos el valor
 
         Entry<K, V> e = (Entry<K, V>)this.table[i];
+        // si encontramos una casilla abierta retornamos -1;
+        if(e.state == OPEN)
+            return -1;
         if (key.equals(e.getKey())) {
             return i;
         }
@@ -266,7 +269,10 @@ public class TSBHashTableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
        }
        else
        {
-           if(this.load_level() >= this.load_factor) { this.rehash(); }
+           if(this.load_level() >= this.load_factor)
+           {
+               this.rehash();
+           }
            int pos = search_for_OPEN(this.table, this.h(key));
            Map.Entry<K, V> entry = new Entry<>(key, value, CLOSED);
            table[pos] = entry;
@@ -293,10 +299,12 @@ public class TSBHashTableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
         if(key == null) throw new NullPointerException("remove(): parámetro null");
         //buscamos la posicion de la key
         int i = posicionPorLlave(key);
+
         //si la encontramos, la borramos y retornamos el valor anterior, y marcamos como tumba la casilla
         if (i != -1) {
             V value = (V) ((Entry<K,V>)table[i]).getValue();
             table[i] = new Entry<>(null, null, TOMBSTONE);
+            this.count--;
             return value;
         }
         return null;
@@ -433,25 +441,29 @@ public class TSBHashTableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
     //************************ Redefinición de métodos heredados desde Object.
     
     /**
-     * Retorna una copia superficial de la tabla. Las listas de desborde o 
-     * buckets que conforman la tabla se clonan ellas mismas, pero no se clonan 
-     * los objetos que esas listas contienen: en cada bucket de la tabla se 
-     * almacenan las direcciones de los mismos objetos que contiene la original. 
+     * clona superficialmente todos los objetos de la tabla y crea una nueva HashTable
      * @return una copia superficial de la tabla.
      * @throws java.lang.CloneNotSupportedException si la clase no implementa la
      *         interface Cloneable.    
      */ 
     @Override
-    protected Object clone() throws CloneNotSupportedException
-    {
-        // HACER...
-        TSBHashTableDA<K, V> t = (TSBHashTableDA<K, V>)super.clone();
-        //clonar la tabla
-        t.table = new Object[table.length];
-        System.arraycopy(this.table, 0, t.table, 0, table.length);
-        t.modCount = 0;
-        t.count = count;
+    protected Object clone() {
+
+        // HACER... Hecho(?
+        TSBHashTableDA<K, V> t = null;
+        try {
+            t = (TSBHashTableDA<K, V>)super.clone();
+            //clonar la tabla
+            t.table = new Object[table.length];
+            System.arraycopy(this.table, 0, t.table, 0, table.length);
+            t.modCount = 0;
+
+        }catch (CloneNotSupportedException e) {
+            System.out.println("Error al clonar, no implementa la interface clonable");;
+        }
+
         return t;
+
     }
 
     /**
@@ -514,12 +526,15 @@ public class TSBHashTableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
         StringBuilder cad = new StringBuilder("[");
         for(int i = 0; i < this.table.length; i++)
         {
+            if(table[i] != null){
+
             Entry<K, V> entry = (Entry<K, V>) table[i];
             if(entry.getState() == CLOSED)
             {
                 cad.append(entry.toString());
                 cad.append(" ");
             }
+        }
         }
         cad.append("]");
         return cad.toString();
@@ -939,7 +954,7 @@ public class TSBHashTableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
      * eliminar un objeto (remove()), eliminar todo el contenido (clear) y la  
      * creación de un Iterator (que incluye el método Iterator.remove()).
      */    
-    private class EntrySet extends AbstractSet<Map.Entry<K, V>> 
+    private class EntrySet extends AbstractSet<Map.Entry<K, V>> implements Iterable<Map.Entry<K,V>>
     {
 
 
@@ -1007,7 +1022,7 @@ public class TSBHashTableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
             public EntrySetIterator()
             {
                 // HACER...
-                actual = 0;
+                actual = -1;
                 previo = 0;
                 next_ok = false;
                 expected_modCount = TSBHashTableDA.this.modCount;
@@ -1076,13 +1091,20 @@ public class TSBHashTableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
             @Override
             public void remove() 
             {
-                // HACER...
+                // HACER...Hecho(?
 
                 if(!next_ok) 
                 { 
                     throw new IllegalStateException("remove(): debe invocar a next() antes de remove()..."); 
                 }
-                
+                // eliminar el objeto que retornó next() la última vez...
+                ((Entry<K,V>)TSBHashTableDA.this.table[actual]).setState(TOMBSTONE);
+
+                // quedar apuntando al anterior al que se retornó...
+                if(previo != actual)
+                {
+                    actual = previo;
+                }
 
                 // avisar que el remove() válido para next() ya se activó...
                 next_ok = false;

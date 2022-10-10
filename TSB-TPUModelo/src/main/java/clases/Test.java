@@ -19,6 +19,7 @@ public class Test
         
         // algunas inserciones...
         ht1.put(1, "Argentina");
+
         ht1.put(2, "Brasil");
         ht1.put(3, "Chile");
         ht1.put(4, "Mexico");
@@ -55,18 +56,30 @@ public class Test
             Map.Entry<Integer, String> entry = it.next();
             System.out.println("Par: " + entry);
         }
-
+        for (   Map.Entry<Integer, String> entry : ht1.entrySet() ) {
+            System.out.println("Par: " + entry);
+        }
         System.out.println("Tabla 1 clonada en una tercera tabla");
         TSBHashTableDA<Integer, String> ht3 = null;
-        try {
-            ht3 = (TSBHashTableDA<Integer, String>) ht1.clone();
-        } catch (CloneNotSupportedException ex) {
-            System.out.println("Error al clonar la tabla");
-        }
+
+
+        ht3 = (TSBHashTableDA<Integer, String>) ht1.clone();
+
+
         System.out.println("Tabla 3: " + ht3);
         ht3.put(13, "Canada");
         System.out.println("Tabla 3 luego de una inserción: " + ht3);
         System.out.println("Tabla 1 luego de una inserción en la tabla 3: " + ht1);
+
+        TSBHashTableDA<String, Integer> map = new TSBHashTableDA<>();
+        map.put("a", 1);
+        map.put("b", 2);
+        map.put("c", 3);
+        map.put("d", 4);
+        map.put("e", 5);
+        for (  Map.Entry<String, Integer> entry : map.entrySet() ) {
+            System.out.println("Par: " + entry);
+        }
 
     }
 }
