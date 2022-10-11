@@ -35,10 +35,12 @@ public class TSBHashTableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
     
     // la cantidad de objetos que contiene la tabla...
     private int count;
+    //la cantidad de objetos reales que contiene la tabla, es decir, contando tumbas
+    private int real_count;
     
     // el factor de carga para calcular si hace falta un rehashing...
     private float load_factor;
-      
+
     
     //************************ Atributos privados (para gestionar las vistas).
 
@@ -278,6 +280,7 @@ public class TSBHashTableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
            table[pos] = entry;
 
            this.count++;
+           this.real_count++;
            this.modCount++;
        }
        
@@ -551,9 +554,15 @@ public class TSBHashTableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
      */
     public boolean contains(Object value)
     {
-        // HACER...
+        // HACER...hecho(?
         if(value == null) return false;
-        
+        Collection<V> values = values();
+        for ( V v : values) {
+            if(v.equals(value)) { return true; }
+        }
+
+
+
         return false;
     }
     
@@ -672,11 +681,12 @@ public class TSBHashTableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
      * Calcula el nivel de carga de la tabla, como un número en coma flotante entre 0 y 1.
      * Si este valor se multiplica por 100, el resultado es el porcentaje de ocupación de la
      * tabla.
+     * se utiliza el valor real de objetos en la tabla, contando tumbas
      * @return el nivel de ocupación de la tabla.
      */
     private float load_level()
     {
-        return (float) this.count / this.table.length;
+        return (float) this.real_count / this.table.length;
     } 
     
     /**
@@ -866,7 +876,8 @@ public class TSBHashTableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
             
             // el valor que debería tener el modCount de la tabla completa...
             private int expected_modCount;
-            
+            private int actual;
+            private int previo;
             /*
              * Crea un iterador comenzando en la primera lista. Activa el 
              * mecanismo fail-fast.
@@ -874,6 +885,8 @@ public class TSBHashTableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
             public KeySetIterator()
             {
                 // HACER...
+                actual=-1;
+                previo=-1;
                 next_ok = false;
                 expected_modCount = TSBHashTableDA.this.modCount;
             }
@@ -885,7 +898,16 @@ public class TSBHashTableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
             @Override
             public boolean hasNext() 
             {
-                // HACER...
+                // HACER...hecho
+                if(TSBHashTableDA.this.isEmpty()) { return false; }
+                if(actual >= TSBHashTableDA.this.table.length) { return false; }
+                int siguiente = actual;
+                // buscamos el siguiente nodo que no este abierto ni sea una tumba...
+                do{
+                    siguiente++;
+                    if(siguiente >= TSBHashTableDA.this.table.length) { return false; }
+                }
+                while (((Entry<K,V>) TSBHashTableDA.this.table[siguiente]).getState() != CLOSED);
                 return true;
             }
 
@@ -895,7 +917,7 @@ public class TSBHashTableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
             @Override
             public K next() 
             {
-                // REVISAR Y HACER...
+                // REVISAR Y HACER...hecho
 
                 // control: fail-fast iterator...
                 if(TSBHashTableDA.this.modCount != expected_modCount)
@@ -907,12 +929,19 @@ public class TSBHashTableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
                 {
                     throw new NoSuchElementException("next(): no existe el elemento pedido...");
                 }
-                
+
+                int siguiente = actual+1;
+                while (((Entry<K,V>) TSBHashTableDA.this.table[siguiente]).getState() != CLOSED)
+                {
+                    siguiente++;
+                }
                 // avisar que next() fue invocado con éxito...
                 next_ok = true;
-                
-                // y retornar la clave del elemento alcanzado...
-                return null;
+                // avanzar el iterador...
+                previo = actual;
+                actual = siguiente;
+                // y retornar el valor del elemento alcanzado...
+                return ((Entry<K,V>) TSBHashTableDA.this.table[siguiente]).getKey();
             }
             
             /*
@@ -971,11 +1000,13 @@ public class TSBHashTableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
         @Override
         public boolean contains(Object o) 
         {
-            // HACER...
+            // HACER...hecho
             if(o == null) { return false; } 
             if(!(o instanceof Entry)) { return false; }
-            
-            return false;
+            V value = TSBHashTableDA.this.get(((Entry)o).getKey());
+            // si el valor es null, no está en la tabla...
+            // si el valor no es null, pero no es igual al valor de o , no está...
+            return value != null && value.equals(((Entry)o).getValue());
         }
 
         /**
@@ -985,10 +1016,10 @@ public class TSBHashTableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
         @Override
         public boolean remove(Object o) 
         {
-            // HACER...
+            // HACER... hecho(?
             if(o == null) { throw new NullPointerException("remove(): parámetro null");}
             if(!(o instanceof Entry)) { return false; }
-
+            TSBHashTableDA.this.remove(((Entry)o).getKey());
             return false;
         }
 
@@ -1021,7 +1052,7 @@ public class TSBHashTableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
              */
             public EntrySetIterator()
             {
-                // HACER...
+                // HACER...Hecho(?
                 actual = -1;
                 previo = 0;
                 next_ok = false;
@@ -1158,7 +1189,8 @@ public class TSBHashTableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
         private class ValueCollectionIterator implements Iterator<V>
         {
             // REVISAR y HACER... Agregar los atributos que necesiten...
-
+private int actual;
+private int previo;
             // flag para controlar si remove() está bien invocado...
             private boolean next_ok;
             
@@ -1172,9 +1204,11 @@ public class TSBHashTableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
             public ValueCollectionIterator()
             {
                 // HACER...
-
+                actual = -1;
+                previo = 0;
                 next_ok = false;
                 expected_modCount = TSBHashTableDA.this.modCount;
+
             }
 
             /*
@@ -1185,13 +1219,27 @@ public class TSBHashTableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
             public boolean hasNext() 
             {
                 // HACER...
-
+                if(TSBHashTableDA.this.isEmpty()) { return false; }
+                if(actual >= TSBHashTableDA.this.table.length) { return false; }
+                int siguiente = actual;
+                // buscamos el siguiente nodo que no este abierto ni sea una tumba...
+                do{
+                    siguiente++;
+                    if(siguiente >= TSBHashTableDA.this.table.length) { return false; }
+                }
+                while (((Entry<K,V>) TSBHashTableDA.this.table[siguiente]).getState() != CLOSED);
                 return true;
+
             }
 
             /*
              * Retorna el siguiente elemento disponible en la tabla.
              */
+
+
+
+            //Map.Entry<K, V> t[] = (Map.Entry<K, V>[]) TSBHashtableDA.this.table;
+
             @Override
             public V next() 
             {
@@ -1207,14 +1255,20 @@ public class TSBHashTableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
                 {
                     throw new NoSuchElementException("next(): no existe el elemento pedido...");
                 }
-                
-
+                int siguiente = actual+1;
+                while (((Entry<K,V>) TSBHashTableDA.this.table[siguiente]).getState() != CLOSED)
+                {
+                    siguiente++;
+                }
                 // avisar que next() fue invocado con éxito...
                 next_ok = true;
-                
-                // y retornar la clave del elemento alcanzado...
-                V value = null;
-                return value;
+                // avanzar el iterador...
+                previo = actual;
+                actual = siguiente;
+                // y retornar el valor del elemento alcanzado...
+                return ((Entry<K,V>) TSBHashTableDA.this.table[siguiente]).getValue();
+
+
             }
             
             /*
@@ -1233,7 +1287,7 @@ public class TSBHashTableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
                     throw new IllegalStateException("remove(): debe invocar a next() antes de remove()..."); 
                 }
                 
-
+                TSBHashTableDA.this.remove(((Entry<K,V>)TSBHashTableDA.this.table[actual]).getKey());
                 // avisar que el remove() válido para next() ya se activó...
                 next_ok = false;
                                 
