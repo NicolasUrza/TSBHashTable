@@ -308,6 +308,7 @@ public class TSBHashTableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
             V value = (V) ((Entry<K,V>)table[i]).getValue();
             table[i] = new Entry<>(null, null, TOMBSTONE);
             this.count--;
+            this.modCount++;
             return value;
         }
         return null;
@@ -884,7 +885,7 @@ public class TSBHashTableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
              */
             public KeySetIterator()
             {
-                // HACER...
+                // HACER...hecho
                 actual=-1;
                 previo=-1;
                 next_ok = false;
@@ -953,7 +954,7 @@ public class TSBHashTableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
             @Override
             public void remove() 
             {
-                // REVISAR Y HACER...
+                // REVISAR Y HACER...hecho
 
                 if(!next_ok) 
                 { 
@@ -962,12 +963,12 @@ public class TSBHashTableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
                 
                 // avisar que el remove() válido para next() ya se activó...
                 next_ok = false;
-                                
-                // la tabla tiene un elementon menos...
-                TSBHashTableDA.this.count--;
-
-                // fail_fast iterator...
-                TSBHashTableDA.this.modCount++;
+                TSBHashTableDA.this.remove(((Entry<K,V>) TSBHashTableDA.this.table[actual]).getKey());
+                // quedar apuntando al anterior al que se retornó...
+                if(previo != actual)
+                {
+                    actual = previo;
+                }
                 expected_modCount++;
             }     
         }
@@ -1020,6 +1021,7 @@ public class TSBHashTableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
             if(o == null) { throw new NullPointerException("remove(): parámetro null");}
             if(!(o instanceof Entry)) { return false; }
             TSBHashTableDA.this.remove(((Entry)o).getKey());
+
             return false;
         }
 
@@ -1129,7 +1131,7 @@ public class TSBHashTableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
                     throw new IllegalStateException("remove(): debe invocar a next() antes de remove()..."); 
                 }
                 // eliminar el objeto que retornó next() la última vez...
-                ((Entry<K,V>)TSBHashTableDA.this.table[actual]).setState(TOMBSTONE);
+                TSBHashTableDA.this.table[actual] = new Entry<K,V>(null, null, TOMBSTONE);
 
                 // quedar apuntando al anterior al que se retornó...
                 if(previo != actual)
@@ -1280,7 +1282,7 @@ private int previo;
             @Override
             public void remove() 
             {
-                // HACER...
+                // HACER...hecho
 
                 if(!next_ok) 
                 { 
@@ -1290,12 +1292,11 @@ private int previo;
                 TSBHashTableDA.this.remove(((Entry<K,V>)TSBHashTableDA.this.table[actual]).getKey());
                 // avisar que el remove() válido para next() ya se activó...
                 next_ok = false;
-                                
-                // la tabla tiene un elementon menos...
-                TSBHashTableDA.this.count--;
-
-                // fail_fast iterator...
-                TSBHashTableDA.this.modCount++;
+                // quedar apuntando al anterior al que se retornó...
+                if(previo != actual)
+                {
+                    actual = previo;
+                }
                 expected_modCount++;
             }     
         }
