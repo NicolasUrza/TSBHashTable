@@ -194,7 +194,8 @@ public class TSBHashTableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
         if(!this.isCompatibleKey(key)) throw new ClassCastException("get(): tipo de key incompatible con la tabla");
 
         // buscamos por exploracion cuadratica mientras no encontremos null ni una casilla abierta
-        int pos = posicionPorLlave(key);
+
+        int pos = search_for_index((K)key, h((K)key));
         if(pos != -1){
             return (V) ((Entry<K,V>)table[pos]).getValue();
         }
@@ -202,32 +203,7 @@ public class TSBHashTableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
         return null;
     }
 
-    /**
-     *  buscca la posicion de una key en la tabla
-     * @param key
-     * @return la posicion en la que encontro la key o -1 si no la encontro
-     */
-    private int posicionPorLlave(Object key){
-    int i = this.h((K)key);
-    int inicial = i;
-    int j =1;
-    do {
-        //si encontramos la key, retornamos el valor
 
-        Entry<K, V> e = (Entry<K, V>)this.table[i];
-        // si encontramos una casilla abierta retornamos -1;
-        if(e.state == OPEN)
-            return -1;
-        if (key.equals(e.getKey())) {
-            return i;
-        }
-        i = (inicial + (int)Math.pow(j, 2)) % this.table.length;
-        j++;
-
-    }
-    while ( this.table[i] != null &&  ((Entry<K,V>)this.table[i]).getState() !=OPEN && i != inicial);
-    return -1;
-}
     /**
      * Determina si la Key es compatible con la clase K de la tabla.
      *
@@ -301,7 +277,7 @@ public class TSBHashTableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
         // HACER... Hecho(?
         if(key == null) throw new NullPointerException("remove(): parámetro null");
         //buscamos la posicion de la key
-        int i = posicionPorLlave(key);
+        int i = search_for_index((K)key,h((K)key) );
 
         //si la encontramos, la borramos y retornamos el valor anterior, y marcamos como tumba la casilla
         if (i != -1) {
@@ -715,7 +691,7 @@ public class TSBHashTableDA<K,V> extends AbstractMap<K,V> implements Map<K,V>, C
 
             Entry<K, V> entry = (Entry<K, V>) table[y];
             if(entry.getState() == OPEN) { return -1; }
-            if(key.equals(entry.getKey())) { return y; }
+            if(entry.getState() == CLOSED && key.equals(entry.getKey())) { return y; }
         }
     }
 
